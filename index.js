@@ -4,8 +4,12 @@ const app = express();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const port = process.env.PORT || 5000;
+const corsOptions = {
+  origin: "*",
+  optionsSuccessStatus: 200,
+}
 
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USE}:${process.env.DB_PASS}@cluster0.dj17rwm.mongodb.net/?retryWrites=true&w=majority`;
