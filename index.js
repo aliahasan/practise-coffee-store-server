@@ -24,6 +24,10 @@ async function run() {
 
     const coffeesCollection = client.db("coffeesDB").collection("coffees");
 
+    const usersCollection = client.db("coffeesDB").collection("users");
+
+
+
     app.get("/coffees", async (req, res) => {
       const cursor = coffeesCollection.find();
       const result = await cursor.toArray();
@@ -39,6 +43,7 @@ async function run() {
     });
 
 
+
     app.get("/coffees/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
@@ -46,11 +51,13 @@ async function run() {
       res.send(result);
     });
 
+
+
     app.put("/coffees/:id", async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const options = { upsert: true };
-      const updatedCoffee = req.body
+      const updatedCoffee = req.body;
       const Coffee = {
         $set: {
           category: updatedCoffee.category,
@@ -62,9 +69,11 @@ async function run() {
           photo: updatedCoffee.photo,
         },
       };
-      const result = await coffeesCollection.updateOne(filter, Coffee, options)
-      res.send(result)
+      const result = await coffeesCollection.updateOne(filter, Coffee, options);
+      res.send(result);
     });
+
+
 
     app.delete("/coffees/:id", async (req, res) => {
       const id = req.params.id;
@@ -72,6 +81,52 @@ async function run() {
       const result = await coffeesCollection.deleteOne(query);
       res.send(result);
     });
+
+
+
+    // user related api
+
+    app.get("/users", async (req, res) => {
+      const cursor = usersCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+
+
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+      console.log(user);
+      const result = await usersCollection.insertOne(user);
+      res.send(result);
+    });
+
+
+
+    app.patch('/users', async (req, res)=>{
+      const user = req.body;
+      const filter = {email: user.email}
+      const updateDoc = {
+        $set:{
+          lastLoginAt: user.lastLoginAt
+        }
+      }
+      const result = await usersCollection.updateOne(filter, updateDoc)
+      res.send(result)
+    })
+
+
+
+
+    app.delete('/users/:id', async(req, res) =>{
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)}
+      const result = await usersCollection.deleteOne(query)
+      res.send(result)
+    })
+
+
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
